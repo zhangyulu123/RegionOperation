@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<meta http-equiv = "X-UA-Compatible" content = "IE=edge" charset = "UTF-8"/>
+		<title>区域表</title>
+		<link rel = "stylesheet" href = "../src/main/webapp/tools/easyui/themes/default/easyui.css"/>
+		<!-- <link rel = "stylesheet" href = "../src/main/webapp/tools/easyui/themes/icon.css"/> -->
+		<script type = "text/javascript" src = "../src/main/webapp/tools/tssJS/tssJS.all.js"></script>
+		<script type = "text/javascript" src = "../src/main/webapp/tools/easyui/jquery.min.js"></script>
+		<script type = "text/javascript" src = "../src/main/webapp/tools/easyui/jquery.easyui.min.js"></script>
+		<script type = "text/javascript" src = "../src/main/webapp/tools/easyui/easyui-lang-zh_CN.js"></script>
+		<script type = "text/javascript" src = "../src/main/webapp/tools/echarts/echarts-3.1.5.js"></script>
+		<style type = "text/css">
+			body {
+				height: 100%;
+				width: 100%;
+				margin: 0;
+			}
+			
+		</style>
+		<script type = "text/javascript">
+		
+			var URL1 = "http://10.45.10.216:8080/tss/data/json/2117"; //省网点承包区数量，保存到data1
+			var URL2 = "http://10.45.10.216:8080/tss/data/json/2122"; //省市网点承包区数量，保存到data2
+			var data1, data2;
+			
+			$(function(){
+				
+				var method = "POST", params = {};
+				
+				tssJS.ajax({
+					url: URL1,
+					params: params,
+					method: method,
+					waiting: true,
+					ondata: function(){
+						data1 = this.getResponseJSON();
+						sel_by_prov(data1);
+					}
+				});	
+				
+				tssJS.ajax({
+					url: URL2,
+					params: params,
+					waiting: true,
+					ondata: function(){
+						data2 = this.getResponseJSON();	
+					}
+				})		
+			});
+			
+		function sel_by_prov(data1){
+				var wd = [], cbq = [], labels = [];
+				$.each(data1, function(i, item){
+					labels.push(item.prov);
+					wd.push(item.numb_w);
+					cbq.push(item.numb_c);
+				});
+				var chart = echarts.init(document.getElementById("canvasDiv"));
+				var option = {
+					title: {
+						text: "各省份网点承包区数量"
+					},
+					xAxis: {
+						type: "category",
+						data: labels
+					},
+					yAxis: {
+						type: "value"
+					},
+					legend: {
+						data: ["网点", "承包区"]
+					},
+					toolbox: {
+						feature: {
+							dataView: {}
+						}
+					},
+					series: [{
+						type: "bar",
+						name: "网点",
+						data: wd
+					},{
+						type: "bar",
+						name: "承包区",
+						data: cbq
+					}]
+				};
+				chart.setOption(option);
+			};	
+		
+		$("#canvasDiv").click(function(){
+			var prov = $(this).name; //点击柱状图对应的省份名
+			alert(prov);
+			var wd = [], cbq = [], labels = [];
+			
+			$.each(data2, function(i, item){
+				if (item.prov === prov){
+					labels.push(item.city);
+					wd.push(item.numb_w);
+					cbq.push(item.numb_c);
+				}	
+			});
+			
+			var chart = echarts.init(document.getElementById("canvasDiv"));
+			var option = {
+				title: {
+					text: prov + "网点承包区数量"
+				},
+				xAxis: {
+					type: "category",
+					data: labels
+				},
+				yAxis: {
+					type: "value"
+				},
+				legend: {
+					data: ["网点", "承包区"]
+				},
+				toolbox: {
+					feature: {
+						dataView: {}
+					}
+				},
+				series: [{
+					type: "bar",
+					name: "网点",
+					data: wd
+				},{
+					type: "bar",
+					name: "承包区",
+					data: cbq
+				}]
+			};
+			chart.setOption(option)
+		});
+		
+		</script>
+	</head>
+	<body>
+		<div id = "wrapper" <!-- style = "width: 100%; height: 100%" -->>
+			<div class = "easyui-layout" fit = "true">
+				<div data-options = "region: 'center'">
+					<div id = "canvasDiv" <!-- style = "width: 100%; height: 100%" -->></div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

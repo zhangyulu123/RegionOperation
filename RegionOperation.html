@@ -86,7 +86,47 @@
 					}]
 				};
 				chart.setOption(option);
+				chart.on("click", function(params){
+					//alert(params.seriesIndex);
+					//alert(params.seriesName);
+					//alert(params.name);
+					//alert(params.dataIndex);
+					//alert(params.data);
+					//alert(params.value);
+					var prov = data1[params.dataIndex].prov;
+					var wd = [], cbq = [], labels = [];
+					
+					$.each(data2, function(i, item){
+						if (item.prov === prov){
+							labels.push(item.city);
+							wd.push(item.numb_w);
+							cbq.push(item.numb_c);
+						};	
+					});
+					
+					chart.setOption({
+						title: {
+								text: prov + "网点承包区数量"
+						},
+						xAxis: {
+								type: "category",
+								data: labels
+						},
+						series: [{
+								type: "bar",
+								name: "网点",
+								data: wd
+						},{
+								type: "bar",
+								name: "承包区",
+								data: cbq
+						}]
+					});
+	
+				});
 			};	
+		
+		
 		
 		$("#canvasDiv").click(function(){
 			var prov = $(this).name; //点击柱状图对应的省份名
@@ -98,7 +138,7 @@
 					labels.push(item.city);
 					wd.push(item.numb_w);
 					cbq.push(item.numb_c);
-				}	
+				};	
 			});
 			
 			var chart = echarts.init(document.getElementById("canvasDiv"));
